@@ -436,7 +436,7 @@ export default function EnhancedCustomerModal({
         isVerified: false
       }
 
-      const response = await api.post('/customers', customerData)
+      const response = await api.post('/api/customers', customerData)
       
       toast.success('Pelanggan berhasil ditambahkan')
       onCustomerCreated(response.data)

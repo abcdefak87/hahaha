@@ -57,7 +57,7 @@ const EditCustomerModal = ({ isOpen, onClose, customer, onCustomerUpdated }: Edi
 
     setIsLoading(true)
     try {
-      const response = await api.put(`/customers/${customer.id}`, formData)
+      const response = await api.put(`/api/customers/${customer.id}`, formData)
       toast.success('Pelanggan berhasil diperbarui!')
       onCustomerUpdated(response.data.data.customer)
       onClose()
@@ -153,7 +153,7 @@ function DeleteConfirmModal({ isOpen, onClose, customer, onCustomerDeleted }: De
     }
 
     try {
-      await api.delete(`/customers/${customerId}`)
+      await api.delete(`/api/customers/${customerId}`)
       toast.success('Pelanggan berhasil dihapus')
       // Real-time update will handle the UI refresh automatically
     } catch (error: any) {
@@ -231,7 +231,7 @@ export default function PelangganPage() {
   const fetchCustomers = async () => {
     try {
       setLoading(true)
-      const response = await api.get('/customers')
+      const response = await api.get('/api/customers')
       setCustomers(response.data.data?.customers || [])
     } catch (error: any) {
       console.error('Failed to fetch customers:', error)

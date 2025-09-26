@@ -109,7 +109,7 @@ export default function Dashboard() {
 
       if (isAdmin) {
         // Admin/superadmin use reports endpoint
-        const response = await api.get('/reports/dashboard', {
+        const response = await api.get('/api/reports/dashboard', {
           signal: abortControllerRef.current.signal
         })
         setDashboardData(response.data)

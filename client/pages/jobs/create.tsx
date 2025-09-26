@@ -74,7 +74,7 @@ export default function CreateJob() {
 
   const fetchCustomers = async () => {
     try {
-      const response = await api.get('/customers')
+      const response = await api.get('/api/customers')
       setCustomers(response.data.data.customers || [])
     } catch (error) {
       console.error('Failed to fetch customers:', error)

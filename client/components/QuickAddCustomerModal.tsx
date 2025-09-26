@@ -33,7 +33,7 @@ export default function QuickAddCustomerModal({
   const onSubmit = async (data: CustomerForm) => {
     setIsLoading(true)
     try {
-      const response = await api.post('/customers', data)
+      const response = await api.post('/api/customers', data)
       const newCustomer = response.data
       
       toast.success('Pelanggan berhasil ditambahkan!')

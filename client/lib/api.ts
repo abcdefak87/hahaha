@@ -183,26 +183,26 @@ export const inventoryAPI = {
 }
 
 export const customersAPI = {
-  getAll: (params?: any) => api.get('/customers', { params }),
-  getById: (id: string) => api.get(`/customers/${id}`),
-  create: (data: any) => api.post('/customers', data),
-  update: (id: string, data: any) => api.put(`/customers/${id}`, data),
-  registerPublic: (data: FormData) => api.post('/customers/register', data, {
+  getAll: (params?: any) => api.get('/api/customers', { params }),
+  getById: (id: string) => api.get(`/api/customers/${id}`),
+  create: (data: any) => api.post('/api/customers', data),
+  update: (id: string, data: any) => api.put(`/api/customers/${id}`, data),
+  registerPublic: (data: FormData) => api.post('/api/customers/register', data, {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
-  checkPhoneExists: (phone: string) => api.post('/customers/check-phone', { phone }),
+  checkPhoneExists: (phone: string) => api.post('/api/customers/check-phone', { phone }),
   // Email verification endpoints removed - no longer required
   getCSRFToken: () => {
-    console.log('Fetching CSRF token from:', `${API_BASE_URL}/customers/register/csrf-token`);
-    return api.get('/customers/register/csrf-token');
+    console.log('Fetching CSRF token from:', `${API_BASE_URL}/api/customers/register/csrf-token`);
+    return api.get('/api/customers/register/csrf-token');
   },
 }
 
 export const reportsAPI = {
-  getDashboard: () => api.get('/reports/dashboard'),
-  getJobs: (params?: any) => api.get('/reports/jobs', { params }),
-  getInventory: (params?: any) => api.get('/reports/inventory', { params }),
-  getTechnicians: (params?: any) => api.get('/reports/technicians', { params }),
+  getDashboard: () => api.get('/api/reports/dashboard'),
+  getJobs: (params?: any) => api.get('/api/reports/jobs', { params }),
+  getInventory: (params?: any) => api.get('/api/reports/inventory', { params }),
+  getTechnicians: (params?: any) => api.get('/api/reports/technicians', { params }),
 }
 
 // WhatsApp API endpoints
