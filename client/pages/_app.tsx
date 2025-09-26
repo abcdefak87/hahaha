@@ -35,11 +35,25 @@ export default function App({ Component, pageProps }: AppProps) {
 
   // Handle redirect logic for refresh scenarios
   useEffect(() => {
-    const currentPath = window.location.pathname
+    const handleRouteChange = (url: string) => {
+      // Save current path to localStorage (except for auth pages)
+      if (url !== '/login' && url !== '/' && url !== '/register' && url !== '/forgot-password') {
+        localStorage.setItem('lastVisitedPath', url)
+      }
+    }
     
-    // Save current path to localStorage (except for login and index)
-    if (currentPath !== '/login' && currentPath !== '/') {
+    // Save initial path
+    const currentPath = window.location.pathname
+    if (currentPath !== '/login' && currentPath !== '/' && currentPath !== '/register' && currentPath !== '/forgot-password') {
       localStorage.setItem('lastVisitedPath', currentPath)
+    }
+    
+    // Listen to route changes
+    const { events } = require('next/router').default
+    events.on('routeChangeComplete', handleRouteChange)
+    
+    return () => {
+      events.off('routeChangeComplete', handleRouteChange)
     }
   }, [])
 

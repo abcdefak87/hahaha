@@ -96,19 +96,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [])
 
   useEffect(() => {
-    const token = Cookies.get('token')
-    if (token) {
-      fetchUser()
-    } else {
-      setLoading(false)
+    const initAuth = async () => {
+      const token = Cookies.get('token')
+      if (token) {
+        await fetchUser()
+      } else {
+        setLoading(false)
+      }
     }
+    
+    initAuth()
   }, [fetchUser])
 
+  // Setup axios interceptor for 401 responses
   useEffect(() => {
-    // Response interceptor to handle errors
     const interceptor = api.interceptors.response.use(
-      (response) => response,
-      (error) => {
+      response => response,
+      error => {
         if (error.response?.status === 401) {
           Cookies.remove('token')
           setUser(null)
@@ -123,7 +127,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       api.interceptors.response.eject(interceptor)
     }
-  }, [router, safeNavigate])
+  }, [])
 
   const login = async (username: string, password: string, rememberMe: boolean = false): Promise<boolean> => {
     try {

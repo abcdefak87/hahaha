@@ -1,57 +1,35 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useAuth } from '../contexts/AuthContext'
+import LoadingScreen from '../components/LoadingScreen'
 
 export default function Home() {
   const { user, loading } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
-    // Only redirect if we're actually on the index page (/)
-    if (window.location.pathname !== '/') {
-      return
-    }
-    
+    // Auto redirect logic
     if (!loading) {
       if (user) {
-        // Check if there's a saved path to restore
+        // User is logged in, redirect to dashboard or last visited page
         const savedPath = localStorage.getItem('lastVisitedPath')
         
-        if (savedPath && savedPath !== '/login' && savedPath !== '/') {
-          try {
-            router.push(savedPath)
-          } catch (error) {
-            console.error('Router push error:', error)
-            window.location.href = savedPath
-          }
-          return
-        }
-        
-        try {
-          router.push('/dashboard')
-        } catch (error) {
-          console.error('Router push error:', error)
-          window.location.href = '/dashboard'
+        if (savedPath && savedPath !== '/login' && savedPath !== '/' && savedPath !== '/register') {
+          // Restore last visited page
+          router.replace(savedPath)
+        } else {
+          // Default to dashboard
+          router.replace('/dashboard')
         }
       } else {
-        try {
-          router.push('/login')
-        } catch (error) {
-          console.error('Router push error:', error)
-          window.location.href = '/login'
-        }
+        // No user, redirect to login
+        router.replace('/login')
       }
     }
   }, [user, loading, router])
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    )
-  }
-
-  return null
+  // Always show loading screen while checking auth
+  // This prevents blank page on refresh
+  return <LoadingScreen message={loading ? "Checking authentication..." : "Redirecting..."} />
 }
 
