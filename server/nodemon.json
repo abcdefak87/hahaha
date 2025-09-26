@@ -1,0 +1,26 @@
+{
+  "watch": [
+    ".",
+    "routes/",
+    "services/",
+    "middleware/",
+    "utils/",
+    "whatsapp/"
+  ],
+  "ext": "js,json",
+  "ignore": [
+    "node_modules/",
+    "logs/",
+    "uploads/",
+    "auth_info_baileys/",
+    "public/",
+    "prisma/migrations/",
+    "*.log"
+  ],
+  "delay": 1000,
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "verbose": true,
+  "restartable": "rs"
+}

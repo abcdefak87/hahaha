@@ -1,0 +1,16 @@
+node_modules/
+logs/
+uploads/
+auth_info_baileys/
+public/
+prisma/migrations/
+*.log
+.env
+.env.local
+.env.production
+.env.test
+coverage/
+.nyc_output/
+.cache/
+dist/
+build/

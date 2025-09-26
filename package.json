@@ -1,0 +1,66 @@
+{
+  "name": "isp-management-system",
+  "version": "1.0.0",
+  "description": "ISP Installation, Repair & Warehouse Management System with WhatsApp Integration",
+  "main": "server/index.js",
+  "scripts": {
+    "setup": "node setup-windows.js",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
+    "install-all": "npm install && cd server && npm install && cd ../client && npm install",
+    "build": "cd client && npm run build",
+    "build:prod": "cd client && npm run build && echo Build completed successfully",
+    "build:server": "cd server && npx prisma generate",
+    "build:production": "npm run build:server && npm run build:prod",
+    "start": "cd server && npm start",
+    "start:prod": "concurrently \"npm run start\" \"cd client && npm start\"",
+    "start:whatsapp": "node scripts/whatsapp-bot-integrated.js",
+    "start:full": "concurrently \"npm run start\" \"cd client && npm start\" \"npm run start:whatsapp\"",
+    "clean-start": "node scripts/clean-start.js",
+    "lint": "eslint server/ --ext .js",
+    "lint:fix": "eslint server/ --ext .js --fix",
+    "format": "prettier --write \"server/**/*.js\"",
+    "format:check": "prettier --check \"server/**/*.js\"",
+    "prepare": "husky install"
+  },
+  "keywords": [
+    "isp",
+    "management",
+    "whatsapp",
+    "inventory",
+    "technician"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "critters": "^0.0.23",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.29.1",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "prettier": "^3.2.5"
+  },
+  "dependencies": {
+    "@hapi/boom": "^10.0.1",
+    "@whiskeysockets/baileys": "^7.0.0-rc.3",
+    "all": "^0.0.0",
+    "express-rate-limit": "^8.1.0",
+    "node-fetch": "^3.3.2",
+    "nodemailer": "^7.0.6",
+    "pino": "^9.9.4",
+    "qrcode": "^1.5.4",
+    "qrcode-terminal": "^0.12.0",
+    "sharp": "^0.32.6",
+    "validator": "^13.15.15"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  }
+}

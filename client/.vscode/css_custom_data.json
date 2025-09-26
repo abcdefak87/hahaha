@@ -1,0 +1,31 @@
+{
+  "version": 1.1,
+  "atDirectives": [
+    {
+      "name": "@tailwind",
+      "description": "Tailwind CSS directive to inject base, components, and utilities styles"
+    },
+    {
+      "name": "@apply",
+      "description": "Tailwind CSS directive to apply utility classes in CSS"
+    },
+    {
+      "name": "@layer",
+      "description": "Tailwind CSS directive to define custom styles in specific layers"
+    },
+    {
+      "name": "@variants",
+      "description": "Tailwind CSS directive to generate responsive, hover, and focus variants"
+    },
+    {
+      "name": "@responsive",
+      "description": "Tailwind CSS directive to generate responsive variants"
+    },
+    {
+      "name": "@screen",
+      "description": "Tailwind CSS directive to apply styles at specific breakpoints"
+    }
+  ],
+  "pseudoClasses": [],
+  "pseudoElements": []
+}

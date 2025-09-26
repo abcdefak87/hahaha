@@ -1,0 +1,16 @@
+# Ignore Tailwind CSS directives warnings
+@tailwind
+@apply
+@layer
+@variants
+@responsive
+@screen
+@config
+
+# Ignore Tailwind functions
+theme()
+screen()
+
+# Files to ignore
+*.css
+styles/globals.css
