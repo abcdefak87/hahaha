@@ -36,10 +36,13 @@ export default function Home() {
       } else {
         // No user, redirect to login
         console.log('[Home] No user, redirecting to login')
-        router.replace('/login').catch(err => {
-          console.error('[Home] Redirect error:', err)
-          window.location.href = '/login'
-        })
+        // Gunakan setTimeout untuk menghindari race condition
+        setTimeout(() => {
+          router.replace('/login').catch(err => {
+            console.error('[Home] Redirect error:', err)
+            window.location.href = '/login'
+          })
+        }, 100)
       }
     }
   }, [user, loading, router, redirecting])
