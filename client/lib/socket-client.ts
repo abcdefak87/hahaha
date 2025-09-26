@@ -224,7 +224,7 @@ export class SocketClient extends EventEmitter {
   /**
    * Send event through Socket.IO
    */
-  public emit(event: string, data?: any): void {
+  public sendMessage(event: string, data?: any): void {
     if (this.socket?.connected) {
       this.socket.emit(event, data)
       this.log(`Emitted event: ${event}`, data)
@@ -232,27 +232,34 @@ export class SocketClient extends EventEmitter {
       this.log(`Socket not connected, queueing event: ${event}`)
       this.queueMessage(event, data)
     }
+    
+    // Emit to EventEmitter for internal handling
+    super.emit(event, data)
   }
 
   /**
    * Listen to Socket.IO events
    */
-  public on(event: string, callback: (...args: any[]) => void): void {
+  public addListener(event: string, callback: (...args: any[]) => void): this {
     if (this.socket) {
       this.socket.on(event, callback)
     }
     // Also add to EventEmitter for internal events
     super.on(event, callback)
+    return this
   }
 
   /**
    * Remove event listener
    */
-  public off(event: string, callback?: (...args: any[]) => void): void {
-    if (this.socket) {
+  public removeListener(event: string, callback?: (...args: any[]) => void): this {
+    if (this.socket && callback) {
       this.socket.off(event, callback)
     }
-    super.off(event, callback)
+    if (callback) {
+      super.off(event, callback)
+    }
+    return this
   }
 
   /**
@@ -341,9 +348,8 @@ export class SocketClient extends EventEmitter {
     
     const messages = [...this.messageQueue]
     this.messageQueue = []
-    
     messages.forEach(({ event, data }) => {
-      this.emit(event, data)
+      this.sendMessage(event, data)
     })
   }
 

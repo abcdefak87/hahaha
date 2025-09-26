@@ -54,29 +54,29 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       socketClientRef.current = client
       
       // Handle connection events
-      client.on('connected', () => {
+      client.addListener('connected', () => {
         console.log('[RealtimeContext] Socket.IO connected')
         setIsConnected(true)
         toast.success('🔗 Real-time connection established', { duration: 2000 })
       })
       
-      client.on('disconnected', () => {
+      client.addListener('disconnected', () => {
         console.log('[RealtimeContext] Socket.IO disconnected')
         setIsConnected(false)
       })
       
-      client.on('reconnecting', (attempt: number) => {
+      client.addListener('reconnecting', (attempt: number) => {
         console.log(`[RealtimeContext] Reconnecting... Attempt ${attempt}`)
         if (attempt === 1) {
           toast.loading('Reconnecting to server...', { id: 'reconnecting' })
         }
       })
       
-      client.on('error', (error: any) => {
+      client.addListener('error', (error: any) => {
         console.error('[RealtimeContext] WebSocket error:', error)
       })
       
-      client.on('max_reconnect_attempts', () => {
+      client.addListener('max_reconnect_attempts', () => {
         toast.error('Failed to connect to server. Please refresh the page.', { 
           duration: 5000,
           id: 'reconnecting' 
@@ -84,7 +84,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       })
       
       // Handle incoming messages
-      client.on('message', (data: any) => {
+      client.addListener('message', (data: any) => {
         handleMessage(data)
       })
       
@@ -92,7 +92,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       client.connect()
       
       // Handle connection error
-      client.on('connect_error', (error: any) => {
+      client.addListener('connect_error', (error: any) => {
         console.error('[RealtimeContext] Failed to connect:', error)
       })
       
@@ -251,7 +251,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
   // Send message through WebSocket
   const sendMessage = useCallback((event: string, data: any) => {
     if (socketClientRef.current?.isConnected) {
-      socketClientRef.current.emit(event, data)
+      socketClientRef.current.sendMessage(event, data)
     } else {
       console.warn('[RealtimeContext] Cannot send message, WebSocket not connected')
     }

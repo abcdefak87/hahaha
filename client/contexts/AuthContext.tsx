@@ -85,7 +85,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       lastProfileFetch.current = now
-      const response = await api.get('/auth/profile')
+      const response = await api.get('/api/auth/profile')
       setUser(response.data.user)
     } catch (error) {
       console.error('Failed to fetch user:', error)
