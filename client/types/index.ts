@@ -9,12 +9,12 @@ export type UserStatus = 'active' | 'inactive' | 'suspended';
 
 export interface User {
   id: string;
-  email: string;
+  phone: string;  // Primary identifier - WhatsApp number
   name: string;
   username?: string;
   role: UserRole;
   status: UserStatus;
-  phone?: string;
+  whatsappNumber?: string;
   avatar?: string;
   lastLogin?: Date | string;
   createdAt: Date | string;
@@ -28,8 +28,7 @@ export type PackageType = '10mbps' | '20mbps' | '30mbps' | '50mbps' | '100mbps';
 export interface Customer {
   id: string;
   name: string;
-  email?: string;
-  phone: string;
+  phone: string;  // Primary contact - WhatsApp number
   address: string;
   package: PackageType;
   status: CustomerStatus;

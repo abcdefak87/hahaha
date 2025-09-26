@@ -11,7 +11,7 @@ model User {
   id                    String                   @id @default(cuid())
   name                  String
   username              String?                  @unique
-  email                 String?                  @unique
+  // email removed - system is phone-first with WhatsApp-only communication
   password              String
   role                  String                   @default("user")
   permissions           String?
@@ -157,7 +157,7 @@ model Customer {
   name               String
   phone              String    @unique
   address            String
-  email              String?   @unique
+  // email removed - phone-first system
   ktpName            String?
   ktpNumber          String?   @unique
   ktpAddress         String?

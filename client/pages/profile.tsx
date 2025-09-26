@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import Layout from '../components/Layout'
 import { useAuth } from '../contexts/AuthContext'
-import { User, Mail, Shield, Calendar, Save, Eye, EyeOff } from 'lucide-react'
+import { User, Phone, Lock, Eye, EyeOff, Shield, Save, X, Edit, Calendar } from 'lucide-react'
 import { api } from '../lib/api'
 
 export default function Profile() {
-  const { user } = useAuth()
+  const { user, logout } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
+    phone: '',
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
@@ -23,7 +23,7 @@ export default function Profile() {
       setFormData(prev => ({
         ...prev,
         name: user.name || '',
-        email: user.email || ''
+        phone: user.phone || ''
       }))
     }
   }, [user])
@@ -49,7 +49,7 @@ export default function Profile() {
 
       const updateData: any = {
         name: formData.name,
-        email: formData.email
+        phone: formData.phone
       }
 
       // Only include password fields if user is changing password
@@ -112,7 +112,7 @@ export default function Profile() {
                 <User className="h-8 w-8 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">{user?.name || user?.email}</h1>
+                <h1 className="text-2xl font-bold text-gray-900">{user?.name || user?.phone}</h1>
                 <div className="flex items-center space-x-3 mt-2">
                   <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getRoleBadgeColor(user?.role || '')}`}>
                     <Shield className="h-4 w-4 mr-1" />
@@ -163,22 +163,22 @@ export default function Profile() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                      Alamat Email
+                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                      Nomor WhatsApp
                     </label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                       <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value={formData.email}
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        value={formData.phone}
                         onChange={handleInputChange}
                         disabled={!isEditing}
                         className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
                           !isEditing ? 'bg-gray-50 text-gray-500' : 'bg-white'
                         }`}
-                        placeholder="Masukkan alamat email Anda"
+                        placeholder="Masukkan nomor WhatsApp Anda"
                       />
                     </div>
                   </div>
@@ -276,7 +276,7 @@ export default function Profile() {
                           setFormData(prev => ({
                             ...prev,
                             name: user?.name || '',
-                            email: user?.email || '',
+                            phone: user?.phone || '',
                             currentPassword: '',
                             newPassword: '',
                             confirmPassword: ''

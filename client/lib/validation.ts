@@ -6,10 +6,8 @@ export const phoneSchema = z.string()
   .min(10, 'Nomor telepon harus minimal 10 digit')
   .max(15, 'Nomor telepon tidak boleh lebih dari 15 digit')
 
-export const emailSchema = z.string()
-  .email('Format email tidak valid')
-  .min(5, 'Email harus minimal 5 karakter')
-  .max(100, 'Email tidak boleh lebih dari 100 karakter')
+// Email removed - system is phone-first with WhatsApp-only communication
+// DO NOT add email validation
 
 export const ktpSchema = z.string()
   .length(16, 'Nomor KTP harus tepat 16 digit')
@@ -32,7 +30,7 @@ export const userRegistrationSchema = z.object({
     .max(50, 'Username tidak boleh lebih dari 50 karakter')
     .regex(/^[a-zA-Z0-9_]+$/, 'Username hanya boleh berisi huruf, angka, dan underscore'),
   
-  email: emailSchema,
+  phone: phoneSchema,
   
   password: passwordSchema,
   
@@ -49,7 +47,7 @@ export const userRegistrationSchema = z.object({
 })
 
 export const userLoginSchema = z.object({
-  email: emailSchema,
+  phone: phoneSchema,
   password: z.string().min(1, 'Password diperlukan')
 })
 
@@ -59,8 +57,6 @@ export const userUpdateSchema = z.object({
     .max(100, 'Nama tidak boleh lebih dari 100 karakter')
     .regex(/^[a-zA-Z\s]+$/, 'Nama hanya boleh berisi huruf dan spasi')
     .optional(),
-  
-  email: emailSchema.optional(),
   
   whatsappNumber: phoneSchema.optional(),
   
@@ -75,8 +71,6 @@ export const customerSchema = z.object({
     .min(2, 'Nama harus minimal 2 karakter')
     .max(100, 'Nama tidak boleh lebih dari 100 karakter')
     .regex(/^[a-zA-Z\s]+$/, 'Nama hanya boleh berisi huruf dan spasi'),
-  
-  email: emailSchema.optional(),
   
   phone: phoneSchema,
   
@@ -143,8 +137,6 @@ export const technicianSchema = z.object({
   name: z.string()
     .min(2, 'Nama harus minimal 2 karakter')
     .max(100, 'Nama tidak boleh lebih dari 100 karakter'),
-  
-  email: emailSchema,
   
   phone: phoneSchema,
   

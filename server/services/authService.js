@@ -44,15 +44,20 @@ class AuthService {
    * @param {Object} userData - User registration data
    * @returns {Promise<Object>} Created user object
    */
-  static async register({ email, password, name, role = 'admin' }) {
+  static async register({ phone, password, name, role = 'admin', username }) {
     try {
       // Check if user already exists
       const existingUser = await prisma.user.findFirst({
-        where: { email }
+        where: {
+          OR: [
+            { phone },
+            { username: username || undefined }
+          ]
+        }
       });
 
       if (existingUser) {
-        throw new Error('Pengguna dengan email ini sudah ada');
+        throw new Error('Pengguna dengan nomor telepon atau username ini sudah ada');
       }
 
       // Validate password
@@ -67,21 +72,24 @@ class AuthService {
       // Create user
       const user = await prisma.user.create({
         data: {
-          email,
+          phone,
+          username: username || phone,
           password: hashedPassword,
           name,
-          role
+          role,
+          whatsappNumber: phone
         },
         select: {
           id: true,
-          email: true,
+          phone: true,
+          username: true,
           name: true,
           role: true,
           createdAt: true
         }
       });
 
-      logger.info(`New user registered: ${email}`);
+      logger.info(`New user registered: ${phone}`);
       return user;
     } catch (error) {
       logger.error('Registration error:', error);
@@ -94,14 +102,14 @@ class AuthService {
    * @param {Object} credentials - Login credentials
    * @returns {Promise<Object>} User object and tokens
    */
-  static async login({ username, email, password }) {
+  static async login({ username, phone, password }) {
     try {
-      // Find user by username or email
+      // Find user by username or phone
       const user = await prisma.user.findFirst({
         where: {
           OR: [
             { username: username || undefined },
-            { email: email || username || undefined }
+            { phone: phone || username || undefined }
           ]
         }
       });
@@ -134,12 +142,12 @@ class AuthService {
         data: { lastLogin: new Date() }
       });
 
-      logger.info(`User logged in: ${user.email}`);
+      logger.info(`User logged in: ${user.phone || user.username}`);
 
       return {
         user: {
           id: user.id,
-          email: user.email,
+          phone: user.phone,
           name: user.name,
           role: user.role,
           username: user.username
@@ -177,7 +185,7 @@ class AuthService {
 
       const newAccessToken = tokenManager.generateAccessToken(user);
       
-      logger.info(`Token refreshed for user: ${user.email}`);
+      logger.info(`Token refreshed for user: ${user.phone || user.username}`);
       
       return { accessToken: newAccessToken };
     } catch (error) {
@@ -213,7 +221,7 @@ class AuthService {
         where: { id: userId },
         select: {
           id: true,
-          email: true,
+          phone: true,
           name: true,
           role: true,
           username: true,
@@ -242,22 +250,23 @@ class AuthService {
    */
   static async updateProfile(userId, updates) {
     try {
-      const { name, email, currentPassword, newPassword } = updates;
+      const { name, phone, currentPassword, newPassword } = updates;
       const updateData = {};
 
-      // If updating email, check if it's already taken
-      if (email) {
+      // If updating phone, check if it's already taken
+      if (phone) {
         const existingUser = await prisma.user.findFirst({
           where: {
-            email,
+            phone,
             NOT: { id: userId }
           }
         });
 
         if (existingUser) {
-          throw new Error('Email sudah digunakan');
+          throw new Error('Nomor telepon sudah digunakan');
         }
-        updateData.email = email;
+        updateData.phone = phone;
+        updateData.whatsappNumber = phone;
       }
 
       // If updating password, verify current password
@@ -292,14 +301,14 @@ class AuthService {
         data: updateData,
         select: {
           id: true,
-          email: true,
+          phone: true,
           name: true,
           role: true,
           username: true
         }
       });
 
-      logger.info(`Profile updated for user: ${updatedUser.email}`);
+      logger.info(`Profile updated for user: ${updatedUser.phone || updatedUser.username}`);
       return updatedUser;
     } catch (error) {
       logger.error('Update profile error:', error);
@@ -309,18 +318,18 @@ class AuthService {
 
   /**
    * Request password reset
-   * @param {string} email - User email
+   * @param {string} phone - User phone number
    * @returns {Promise<void>}
    */
-  static async requestPasswordReset(email) {
+  static async requestPasswordReset(phone) {
     try {
       const user = await prisma.user.findFirst({
-        where: { email }
+        where: { phone }
       });
 
       if (!user) {
         // Don't reveal if user exists or not
-        return { message: 'Jika email terdaftar, kode OTP akan dikirim' };
+        return { message: 'Jika nomor terdaftar, kode OTP akan dikirim via WhatsApp' };
       }
 
       // Generate OTP
@@ -331,8 +340,8 @@ class AuthService {
         await whatsappMessenger.sendOTP(user.phone, otp);
       }
 
-      logger.info(`Password reset requested for: ${email}`);
-      return { message: 'Jika email terdaftar, kode OTP akan dikirim' };
+      logger.info(`Password reset requested for: ${phone}`);
+      return { message: 'Jika nomor terdaftar, kode OTP akan dikirim via WhatsApp' };
     } catch (error) {
       logger.error('Password reset request error:', error);
       throw error;
@@ -344,14 +353,14 @@ class AuthService {
    * @param {Object} data - Reset data
    * @returns {Promise<void>}
    */
-  static async resetPassword({ email, otp, newPassword }) {
+  static async resetPassword({ phone, otp, newPassword }) {
     try {
       const user = await prisma.user.findFirst({
-        where: { email }
+        where: { phone }
       });
 
       if (!user) {
-        throw new Error('Invalid email or OTP');
+        throw new Error('Invalid phone number or OTP');
       }
 
       // Verify OTP
@@ -373,7 +382,7 @@ class AuthService {
         data: { password: hashedPassword }
       });
 
-      logger.info(`Password reset successful for: ${email}`);
+      logger.info(`Password reset successful for: ${phone}`);
       return { message: 'Password berhasil direset' };
     } catch (error) {
       logger.error('Password reset error:', error);
