@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode, useRef } from 'react'
+import React, { createContext, useContext, useEffect, useState, ReactNode, useRef, useCallback } from 'react'
 import { useAuth } from './AuthContext'
-import websocketService from '../lib/websocket'
+import { WebSocketClient, getWebSocketClient } from '../lib/websocket-client'
 import toast from 'react-hot-toast'
 
 interface RealtimeContextType {
