@@ -55,8 +55,8 @@ class BotDatabaseService {
 
       const reg = await prisma.technicianRegistration.create({
         data: {
-          telegramChatId: whatsappJid || (normalized ? normalized + '@s.whatsapp.net' : null),
-          telegramUsername: null,
+          whatsappNumber: normalized,
+          whatsappJid: whatsappJid || (normalized ? normalized + '@s.whatsapp.net' : null),
           firstName: firstName || (name || 'Teknisi'),
           lastName,
           phone: normalized,

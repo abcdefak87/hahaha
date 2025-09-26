@@ -55,14 +55,32 @@ router.post('/registrations/:id/approve', authenticateToken, requirePermission('
       });
     }
 
+    // Generate random password for technician
+    const bcrypt = require('bcryptjs');
+    const randomPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-4).toUpperCase();
+    const hashedPassword = await bcrypt.hash(randomPassword, 10);
+    
     // Create technician
     const technician = await prisma.technician.create({
       data: {
         name: `${registration.firstName} ${registration.lastName || ''}`.trim(),
         phone: registration.phone,
-        whatsappJid: registration.telegramChatId || `${registration.phone}@s.whatsapp.net`,
+        whatsappJid: registration.whatsappJid || `${registration.phone}@s.whatsapp.net`,
         isActive: true,
         isAdmin: false
+      }
+    });
+
+    // Create user account for technician
+    const user = await prisma.user.create({
+      data: {
+        username: registration.phone, // Use phone as username
+        password: hashedPassword,
+        name: technician.name,
+        phone: registration.phone,
+        whatsappNumber: registration.phone,
+        role: 'technician',
+        isActive: true
       }
     });
 
@@ -72,13 +90,41 @@ router.post('/registrations/:id/approve', authenticateToken, requirePermission('
       data: {
         status: 'APPROVED',
         approvedAt: new Date(),
-        approvedBy: req.user.userId
+        approvedById: req.user.userId
       }
     });
 
+    // Send WhatsApp notification to technician
+    try {
+      const notificationService = require('../services/notificationService');
+      const message = `✅ *Selamat! Registrasi Anda Telah Disetujui*
+
+Anda sekarang terdaftar sebagai teknisi di sistem kami.
+
+*Informasi Login:*
+📱 Username: ${registration.phone}
+🔑 Password: ${randomPassword}
+
+*URL Login:*
+${process.env.FRONTEND_URL || 'http://localhost:3000'}/login
+
+Silakan login dan ganti password Anda.
+
+Terima kasih! 🙏`;
+
+      await notificationService.sendWhatsAppNotification(
+        registration.phone,
+        message
+      );
+    } catch (notifError) {
+      console.error('Failed to send WhatsApp notification:', notifError);
+      // Don't fail the approval if notification fails
+    }
+
     res.json({
       success: true,
-      data: technician
+      data: technician,
+      message: 'Teknisi berhasil diapprove dan notifikasi telah dikirim'
     });
   } catch (error) {
     console.error('Approve technician registration error:', error);

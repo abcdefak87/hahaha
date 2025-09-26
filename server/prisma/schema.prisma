@@ -393,8 +393,8 @@ model TeamRoomMessage {
 
 model TechnicianRegistration {
   id               String    @id @default(cuid())
-  telegramChatId   String
-  telegramUsername String?
+  whatsappNumber   String
+  whatsappJid      String?
   firstName        String
   lastName         String?
   phone            String?

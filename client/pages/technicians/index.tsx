@@ -85,16 +85,15 @@ export default function Technicians() {
         return <Clock className="h-4 w-4" />
       case 'OFFLINE':
         return <AlertTriangle className="h-4 w-4" />
-      default:
         return <User className="h-4 w-4" />
     }
   }
 
   const deleteTechnician = async (id: string) => {
-    if (!confirm('Apakah Anda yakin ingin menghapus teknisi ini?')) return
-
+    if (!confirm('Yakin ingin menghapus teknisi ini?')) return
+    
     try {
-      await api.delete(`/technicians/${id}`)
+      await api.delete(`/api/technicians/${id}`)
       toast.success('Teknisi berhasil dihapus')
       fetchTechnicians()
     } catch (error: any) {
