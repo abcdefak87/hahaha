@@ -35,6 +35,7 @@ router.get('/registrations', authenticateToken, requirePermission('technicians:v
 router.post('/registrations/:id/approve', authenticateToken, requirePermission('technicians:create'), async (req, res) => {
   try {
     const { id } = req.params;
+    console.log('📋 Approving technician registration:', id);
     
     // Get registration
     const registration = await prisma.technicianRegistration.findUnique({
@@ -55,10 +56,31 @@ router.post('/registrations/:id/approve', authenticateToken, requirePermission('
       });
     }
 
+    console.log('📱 Registration found for phone:', registration.phone);
+
     // Generate random password for technician
     const bcrypt = require('bcryptjs');
     const randomPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-4).toUpperCase();
     const hashedPassword = await bcrypt.hash(randomPassword, 10);
+    console.log('🔑 Generated password for technician');
+    
+    // Check if technician already exists
+    const existingTechnician = await prisma.technician.findFirst({
+      where: {
+        OR: [
+          { phone: registration.phone },
+          { whatsappJid: registration.whatsappJid || `${registration.phone}@s.whatsapp.net` }
+        ]
+      }
+    });
+
+    if (existingTechnician) {
+      console.log('⚠️ Technician already exists with this phone number');
+      return res.status(400).json({
+        success: false,
+        error: 'Technician already exists with this phone number'
+      });
+    }
     
     // Create technician
     const technician = await prisma.technician.create({
@@ -70,19 +92,45 @@ router.post('/registrations/:id/approve', authenticateToken, requirePermission('
         isAdmin: false
       }
     });
+    console.log('✅ Technician created:', technician.id);
 
-    // Create user account for technician
-    const user = await prisma.user.create({
-      data: {
-        username: registration.phone, // Use phone as username
-        password: hashedPassword,
-        name: technician.name,
-        phone: registration.phone,
-        whatsappNumber: registration.phone,
-        role: 'technician',
-        isActive: true
+    // Check if user already exists
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { username: registration.phone },
+          { phone: registration.phone }
+        ]
       }
     });
+
+    let user;
+    if (existingUser) {
+      console.log('⚠️ User already exists, updating password');
+      // Update existing user
+      user = await prisma.user.update({
+        where: { id: existingUser.id },
+        data: {
+          password: hashedPassword,
+          role: 'technician',
+          isActive: true
+        }
+      });
+    } else {
+      // Create user account for technician
+      user = await prisma.user.create({
+        data: {
+          username: registration.phone, // Use phone as username
+          password: hashedPassword,
+          name: technician.name,
+          phone: registration.phone,
+          whatsappNumber: registration.phone,
+          role: 'technician',
+          isActive: true
+        }
+      });
+    }
+    console.log('✅ User account created/updated:', user.id);
 
     // Update registration status
     await prisma.technicianRegistration.update({
@@ -96,7 +144,7 @@ router.post('/registrations/:id/approve', authenticateToken, requirePermission('
 
     // Send WhatsApp notification to technician
     try {
-      const notificationService = require('../services/notificationService');
+      const whatsappMessenger = require('../utils/whatsappMessenger');
       const message = `✅ *Selamat! Registrasi Anda Telah Disetujui*
 
 Anda sekarang terdaftar sebagai teknisi di sistem kami.
@@ -112,10 +160,13 @@ Silakan login dan ganti password Anda.
 
 Terima kasih! 🙏`;
 
-      await notificationService.sendWhatsAppNotification(
-        registration.phone,
-        message
-      );
+      const result = await whatsappMessenger.sendMessage(registration.phone, message);
+      
+      if (result.success) {
+        console.log('✅ WhatsApp notification sent to technician:', registration.phone);
+      } else {
+        console.error('❌ Failed to send WhatsApp notification:', result.error);
+      }
     } catch (notifError) {
       console.error('Failed to send WhatsApp notification:', notifError);
       // Don't fail the approval if notification fails
