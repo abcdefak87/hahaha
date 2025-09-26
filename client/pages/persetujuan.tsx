@@ -56,7 +56,7 @@ const JobApprovalPage: React.FC = () => {
         return;
       }
 
-      const response = await api.get('/jobs/pending-approval');
+      const response = await api.get('/api/jobs/pending-approval');
       setPendingJobs(response.data.data);
     } catch (error: any) {
       console.error('Error fetching pending jobs:', error);

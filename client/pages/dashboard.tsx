@@ -115,7 +115,7 @@ export default function Dashboard() {
         setDashboardData(response.data)
       } else if (!isGudang) {
         // Everyone except gudang uses dashboard stats endpoint
-        const res = await api.get('/dashboard/stats', {
+        const res = await api.get('/api/dashboard/stats', {
           signal: abortControllerRef.current.signal
         })
         const d = res.data || {}

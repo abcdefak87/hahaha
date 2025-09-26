@@ -192,7 +192,7 @@ export default function CreateJob() {
       }
 
       // Remove Content-Type header to let browser set it automatically with boundary
-      const response = await api.post('/jobs', formData)
+      const response = await api.post('/api/jobs', formData)
 
       toast.success('Tiket berhasil dibuat!')
       router.push('/jobs')

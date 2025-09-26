@@ -145,41 +145,41 @@ export const authAPI = {
 }
 
 export const jobsAPI = {
-  getAll: (params?: any) => api.get('/jobs', { params }),
-  getById: (id: string) => api.get(`/jobs/${id}`),
-  create: (data: FormData) => api.post('/jobs', data, {
+  getAll: (params?: any) => api.get('/api/jobs', { params }),
+  getById: (id: string) => api.get(`/api/jobs/${id}`),
+  create: (data: FormData) => api.post('/api/jobs', data, {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
-  updateStatus: (id: string, data: any) => api.put(`/jobs/${id}/status`, data),
-  assign: (id: string, data: any) => api.post(`/jobs/${id}/assign`, data),
-  selfAssign: (id: string) => api.post(`/jobs/${id}/self-assign`, {}),
-  confirm: (id: string, data: { action: 'ACCEPT' | 'DECLINE' }) => api.post(`/jobs/${id}/confirm`, data),
-  complete: (id: string, data: FormData) => api.put(`/jobs/${id}/complete`, data, {
+  updateStatus: (id: string, data: any) => api.put(`/api/jobs/${id}/status`, data),
+  assign: (id: string, data: any) => api.post(`/api/jobs/${id}/assign`, data),
+  selfAssign: (id: string) => api.post(`/api/jobs/${id}/self-assign`, {}),
+  confirm: (id: string, data: { action: 'ACCEPT' | 'DECLINE' }) => api.post(`/api/jobs/${id}/confirm`, data),
+  complete: (id: string, data: FormData) => api.put(`/api/jobs/${id}/complete`, data, {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
-  delete: (id: string) => api.delete(`/jobs/${id}`),
+  delete: (id: string) => api.delete(`/api/jobs/${id}`),
 }
 
 export const techniciansAPI = {
-  getAll: () => api.get('/technicians'),
-  getById: (id: string) => api.get(`/technicians/${id}`),
-  getAvailable: () => api.get('/technicians/available/for-job'),
-  create: (data: any) => api.post('/technicians', data),
-  update: (id: string, data: any) => api.put(`/technicians/${id}`, data),
-  delete: (id: string) => api.delete(`/technicians/${id}`),
+  getAll: () => api.get('/api/technicians'),
+  getById: (id: string) => api.get(`/api/technicians/${id}`),
+  getAvailable: () => api.get('/api/technicians/available/for-job'),
+  create: (data: any) => api.post('/api/technicians', data),
+  update: (id: string, data: any) => api.put(`/api/technicians/${id}`, data),
+  delete: (id: string) => api.delete(`/api/technicians/${id}`),
 }
 
 export const inventoryAPI = {
-  getItems: (params?: any) => api.get('/inventory/items', { params }),
-  getItemById: (id: string) => api.get(`/inventory/items/${id}`),
-  createItem: (data: any) => api.post('/inventory/items', data),
-  updateItem: (id: string, data: any) => api.put(`/inventory/items/${id}`, data),
-  addStock: (id: string, data: any) => api.post(`/inventory/items/${id}/stock/add`, data),
-  removeStock: (id: string, data: any) => api.post(`/inventory/items/${id}/stock/remove`, data),
-  returnStock: (id: string, data: any) => api.post(`/inventory/items/${id}/stock/return`, data),
-  damageStock: (id: string, data: any) => api.post(`/inventory/items/${id}/stock/damage`, data),
-  getLogs: (params?: any) => api.get('/inventory/logs', { params }),
-  getLowStock: () => api.get('/inventory/low-stock'),
+  getItems: (params?: any) => api.get('/api/inventory/items', { params }),
+  getItemById: (id: string) => api.get(`/api/inventory/items/${id}`),
+  createItem: (data: any) => api.post('/api/inventory/items', data),
+  updateItem: (id: string, data: any) => api.put(`/api/inventory/items/${id}`, data),
+  addStock: (id: string, data: any) => api.post(`/api/inventory/items/${id}/stock/add`, data),
+  removeStock: (id: string, data: any) => api.post(`/api/inventory/items/${id}/stock/remove`, data),
+  returnStock: (id: string, data: any) => api.post(`/api/inventory/items/${id}/stock/return`, data),
+  damageStock: (id: string, data: any) => api.post(`/api/inventory/items/${id}/stock/damage`, data),
+  getLogs: (params?: any) => api.get('/api/inventory/logs', { params }),
+  getLowStock: () => api.get('/api/inventory/low-stock'),
 }
 
 export const customersAPI = {
@@ -207,18 +207,18 @@ export const reportsAPI = {
 
 // WhatsApp API endpoints
 export const whatsappAPI = {
-  getStatus: () => api.get('/whatsapp/status'),
-  getStats: () => api.get('/whatsapp/stats'),
-  sendTestMessage: (data: { phone: string; message?: string }) => api.post('/monitoring/whatsapp/test', data),
-  initialize: () => api.post('/whatsapp/initialize'),
-  sendMessage: (data: { to: string; message: string }) => api.post('/whatsapp/send', data),
+  getStatus: () => api.get('/api/whatsapp/status'),
+  getStats: () => api.get('/api/whatsapp/stats'),
+  sendTestMessage: (data: { phone: string; message?: string }) => api.post('/api/monitoring/whatsapp/test', data),
+  initialize: () => api.post('/api/whatsapp/initialize'),
+  sendMessage: (data: { to: string; message: string }) => api.post('/api/whatsapp/send', data),
 }
 
 // Monitoring API endpoints
 export const monitoringAPI = {
-  getSystemStats: () => api.get('/monitoring/stats'),
-  getWhatsAppStatus: () => api.get('/monitoring/whatsapp/status'),
-  testWhatsApp: (data: { phone: string; message?: string }) => api.post('/monitoring/whatsapp/test', data),
+  getSystemStats: () => api.get('/api/monitoring/stats'),
+  getWhatsAppStatus: () => api.get('/api/monitoring/whatsapp/status'),
+  testWhatsApp: (data: { phone: string; message?: string }) => api.post('/api/monitoring/whatsapp/test', data),
 }
 
 // Development API testing utilities (only available in development)
