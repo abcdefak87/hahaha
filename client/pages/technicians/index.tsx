@@ -58,7 +58,7 @@ export default function Technicians() {
       if (search) params.append('search', search)
       if (statusFilter) params.append('status', statusFilter)
       
-      const response = await api.get(`/technicians?search=${search}&status=${statusFilter}`)
+      const response = await api.get(`/api/technicians?search=${search}&status=${statusFilter}`)
       setTechnicians(response.data.data?.technicians || [])
     } catch (error) {
       console.error('Failed to fetch technicians:', error)
@@ -106,7 +106,7 @@ export default function Technicians() {
   const fetchRegistrations = async () => {
     try {
       setIsLoadingRegistrations(true)
-      const response = await api.get('/registrations')
+      const response = await api.get('/api/technicians/registrations')
       setRegistrations(response.data.data || [])
     } catch (error) {
       console.error('Failed to fetch registrations:', error)

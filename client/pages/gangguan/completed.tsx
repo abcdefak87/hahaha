@@ -42,7 +42,7 @@ export default function GangguanCompletedPage() {
   }, [router.query])
 
   // Real-time data hook - only completed GANGGUAN jobs
-  const endpoint = `/jobs?${new URLSearchParams({
+  const endpoint = `/api/jobs?${new URLSearchParams({
     category: 'GANGGUAN',
     status: 'COMPLETED',
     ...(search && { search }),

@@ -50,7 +50,7 @@ export default function PSBPage() {
   }, [router.query])
 
   // Real-time data hook - only PSB jobs
-  const endpoint = `/jobs?${new URLSearchParams({
+  const endpoint = `/api/jobs?${new URLSearchParams({
     category: 'PSB',
     ...(search && { search }),
     ...(statusFilter && { status: statusFilter }),

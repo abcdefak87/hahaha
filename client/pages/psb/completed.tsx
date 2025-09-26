@@ -42,7 +42,7 @@ export default function PSBCompletedPage() {
   }, [router.query])
 
   // Real-time data hook - only completed PSB jobs
-  const endpoint = `/jobs?${new URLSearchParams({
+  const endpoint = `/api/jobs?${new URLSearchParams({
     category: 'PSB',
     status: 'COMPLETED',
     ...(search && { search }),

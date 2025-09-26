@@ -49,7 +49,7 @@ export default function Jobs() {
   }, [router.query])
 
   // Real-time data hook
-  const endpoint = `/jobs?${new URLSearchParams({
+  const endpoint = `/api/jobs?${new URLSearchParams({
     ...(search && { search }),
     ...(statusFilter && { status: statusFilter }),
     ...(typeFilter && { type: typeFilter }),

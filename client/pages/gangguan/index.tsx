@@ -46,7 +46,7 @@ export default function GangguanPage() {
   }, [router.query])
 
   // Real-time data hook - only GANGGUAN jobs
-  const endpoint = `/jobs?${new URLSearchParams({
+  const endpoint = `/api/jobs?${new URLSearchParams({
     category: 'GANGGUAN',
     ...(search && { search }),
     ...(statusFilter && { status: statusFilter }),
