@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode, useRef, useCallback } from 'react'
 import { useAuth } from './AuthContext'
-import { WebSocketClient } from '../lib/websocket-client'
+import { SocketClient } from '../lib/socket-client'
 import toast from 'react-hot-toast'
 
 interface RealtimeContextType {
@@ -32,60 +32,51 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth()
   const [isConnected, setIsConnected] = useState(false)
   const [notifications, setNotifications] = useState<Notification[]>([])
-  const wsClientRef = useRef<WebSocketClient | null>(null)
+  const socketClientRef = useRef<SocketClient | null>(null)
   const eventHandlersRef = useRef<Map<string, Set<Function>>>(new Map())
 
   // Initialize WebSocket connection
   useEffect(() => {
     if (!loading && user?.id) {
-      const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 
-                    `ws://localhost:3001/socket.io/?userId=${user.id}&role=${user.role}&transport=websocket`
+      console.log('[RealtimeContext] Initializing Socket.IO connection...')
       
-      console.log('[RealtimeContext] Initializing WebSocket connection...')
-      
-      // Create WebSocket client
-      const client = new WebSocketClient({
-        url: wsUrl,
+      // Create Socket.IO client
+      const client = new SocketClient({
+        url: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
+        userId: user.id,
+        role: user.role,
         reconnect: true,
-        reconnectInterval: 3000,
-        maxReconnectAttempts: 10,
-        heartbeatInterval: 25000,
+        reconnectDelay: 3000,
+        reconnectAttempts: 10,
         debug: process.env.NODE_ENV === 'development'
       })
       
-      wsClientRef.current = client
+      socketClientRef.current = client
       
       // Handle connection events
-      client.on('open', () => {
-        console.log('[RealtimeContext] WebSocket connected')
+      client.on('connected', () => {
+        console.log('[RealtimeContext] Socket.IO connected')
         setIsConnected(true)
         toast.success('🔗 Real-time connection established', { duration: 2000 })
-        
-        // Send authentication
-        client.send({
-          type: 'auth',
-          userId: user.id,
-          role: user.role
-        })
       })
       
-      client.on('close', () => {
-        console.log('[RealtimeContext] WebSocket disconnected')
+      client.on('disconnected', () => {
+        console.log('[RealtimeContext] Socket.IO disconnected')
         setIsConnected(false)
       })
       
-      client.on('reconnecting', ({ attempt, delay }) => {
-        console.log(`[RealtimeContext] Reconnecting... Attempt ${attempt} in ${delay}ms`)
+      client.on('reconnecting', (attempt: number) => {
+        console.log(`[RealtimeContext] Reconnecting... Attempt ${attempt}`)
         if (attempt === 1) {
           toast.loading('Reconnecting to server...', { id: 'reconnecting' })
         }
       })
       
-      client.on('error', (error) => {
+      client.on('error', (error: any) => {
         console.error('[RealtimeContext] WebSocket error:', error)
       })
       
-      client.on('maxReconnectAttemptsReached', () => {
+      client.on('max_reconnect_attempts', () => {
         toast.error('Failed to connect to server. Please refresh the page.', { 
           duration: 5000,
           id: 'reconnecting' 
@@ -93,23 +84,29 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       })
       
       // Handle incoming messages
-      client.on('message', (data) => {
+      client.on('message', (data: any) => {
         handleMessage(data)
       })
       
       // Connect to server
-      client.connect().catch(error => {
+      client.connect()
+      
+      // Handle connection error
+      client.on('connect_error', (error: any) => {
         console.error('[RealtimeContext] Failed to connect:', error)
       })
       
       // Cleanup on unmount
       return () => {
-        console.log('[RealtimeContext] Cleaning up WebSocket connection')
-        if (wsClientRef.current) {
-          wsClientRef.current.close()
-          wsClientRef.current = null
+        console.log('[RealtimeContext] Cleaning up Socket.IO connection')
+        const currentClient = socketClientRef.current
+        const currentHandlers = eventHandlersRef.current
+        
+        if (currentClient) {
+          currentClient.disconnect()
+          socketClientRef.current = null
         }
-        eventHandlersRef.current.clear()
+        currentHandlers.clear()
       }
     }
   }, [user, loading])
@@ -253,12 +250,8 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
   
   // Send message through WebSocket
   const sendMessage = useCallback((event: string, data: any) => {
-    if (wsClientRef.current?.isConnected) {
-      wsClientRef.current.send({
-        type: event,
-        data,
-        timestamp: Date.now()
-      })
+    if (socketClientRef.current?.isConnected) {
+      socketClientRef.current.emit(event, data)
     } else {
       console.warn('[RealtimeContext] Cannot send message, WebSocket not connected')
     }
