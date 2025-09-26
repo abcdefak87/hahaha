@@ -5,6 +5,7 @@
 
 import { io, Socket } from 'socket.io-client'
 import { EventEmitter } from 'events'
+import Cookies from 'js-cookie'
 
 interface SocketConfig {
   url?: string
@@ -28,6 +29,7 @@ export class SocketClient extends EventEmitter {
   private messageQueue: QueuedMessage[] = []
   private isIntentionallyClosed = false
   private reconnectTimer: NodeJS.Timeout | null = null
+  private heartbeatTimer: NodeJS.Timeout | null = null
   private reconnectAttempts = 0
 
   constructor(config: SocketConfig = {}) {
@@ -56,6 +58,15 @@ export class SocketClient extends EventEmitter {
     this.log(`Connecting to ${this.config.url}...`)
     this.isIntentionallyClosed = false
 
+    // Get JWT token from cookies
+    const token = Cookies.get('token')
+    
+    if (!token) {
+      this.log('No authentication token found')
+      this.emit('error', new Error('No authentication token'))
+      throw new Error('Authentication token required')
+    }
+
     // Create Socket.IO connection with options
     this.socket = io(this.config.url, {
       transports: ['websocket', 'polling'],
@@ -64,7 +75,11 @@ export class SocketClient extends EventEmitter {
       reconnectionDelay: this.config.reconnectDelay,
       reconnectionDelayMax: 10000,
       timeout: 20000,
+      auth: {
+        token: token
+      },
       query: {
+        token: token,
         userId: this.config.userId,
         role: this.config.role
       }
@@ -88,16 +103,20 @@ export class SocketClient extends EventEmitter {
       this.reconnectAttempts = 0
       this.emit('connected')
       
-      // Process queued messages
-      this.processMessageQueue()
-      
-      // Send authentication if userId is provided
+      // Join user rooms after connection
       if (this.config.userId) {
-        this.socket?.emit('authenticate', {
+        this.socket?.emit('join-room', {
           userId: this.config.userId,
           role: this.config.role
         })
+        this.log('Joined user rooms')
       }
+      
+      // Start heartbeat
+      this.startHeartbeat()
+      
+      // Process queued messages
+      this.processMessageQueue()
     })
 
     this.socket.on('disconnect', (reason) => {
@@ -237,10 +256,36 @@ export class SocketClient extends EventEmitter {
   }
 
   /**
+   * Start heartbeat to keep connection alive
+   */
+  private startHeartbeat(): void {
+    this.stopHeartbeat()
+    
+    this.heartbeatTimer = setInterval(() => {
+      if (this.socket?.connected) {
+        this.socket.emit('heartbeat', { timestamp: Date.now() })
+        this.log('Heartbeat sent')
+      }
+    }, 20000) // Send heartbeat every 20 seconds
+  }
+  
+  /**
+   * Stop heartbeat
+   */
+  private stopHeartbeat(): void {
+    if (this.heartbeatTimer) {
+      clearInterval(this.heartbeatTimer)
+      this.heartbeatTimer = null
+    }
+  }
+  
+  /**
    * Disconnect from server
    */
   public disconnect(): void {
     this.isIntentionallyClosed = true
+    
+    this.stopHeartbeat()
     
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer)
