@@ -103,8 +103,8 @@ isp-management-system/
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/abcdefak87/gitcomgitpush.git
-cd gitcomgitpush
+git clone https://github.com/abcdefak87/hahaha.git
+cd hahaha
 ```
 
 ### 2. Install Dependencies
@@ -470,8 +470,8 @@ sudo apt-get install -y nodejs
 sudo npm install -g pm2
 
 # Clone and setup
-git clone https://github.com/abcdefak87/gitcomgitpush.git
-cd gitcomgitpush
+git clone https://github.com/abcdefak87/hahaha.git
+cd hahaha
 npm run install-all
 
 # Setup environment
