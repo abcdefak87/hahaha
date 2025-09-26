@@ -139,7 +139,7 @@ export default function WhatsApp() {
   const testBot = async () => {
     try {
       toast.loading('Menguji koneksi WhatsApp...')
-      const response = await api.post('/monitoring/whatsapp/test', {
+      const response = await api.post('/api/monitoring/whatsapp/test', {
         phone: '6282229261247',
         message: 'Pesan test dari Sistem Manajemen ISP'
       })
