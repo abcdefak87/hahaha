@@ -124,7 +124,7 @@ export default function Technicians() {
     if (!confirm(confirmMessage)) return
 
     try {
-      await api.put(`/technicians/${id}`, { isAdmin: newRole })
+      await api.put(`/api/technicians/${id}`, { isAdmin: newRole })
       toast.success(`${technicianName} berhasil diubah menjadi ${roleText}`)
       fetchTechnicians()
     } catch (error: any) {

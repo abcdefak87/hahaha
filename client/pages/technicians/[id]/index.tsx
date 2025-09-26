@@ -114,7 +114,7 @@ export default function TechnicianDetailPage() {
     if (!technician) return
 
     try {
-      const response = await api.patch(`/technicians/${id}/admin-role`, {
+      const response = await api.patch(`/api/technicians/${id}/admin-role`, {
         isAdmin: !technician.isAdmin
       })
       

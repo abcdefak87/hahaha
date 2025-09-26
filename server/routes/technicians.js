@@ -104,6 +104,18 @@ router.post('/registrations/:id/approve', authenticateToken, requirePermission('
       }
     });
 
+    // Normalize phone for username
+    let normalizedPhone = registration.phone;
+    if (normalizedPhone) {
+      normalizedPhone = normalizedPhone.toString().replace(/[^0-9]/g, '');
+      if (normalizedPhone.startsWith('0')) {
+        normalizedPhone = '62' + normalizedPhone.substring(1);
+      }
+      if (!normalizedPhone.startsWith('62')) {
+        normalizedPhone = '62' + normalizedPhone;
+      }
+    }
+    
     let user;
     if (existingUser) {
       console.log('⚠️ User already exists, updating password');
@@ -113,18 +125,20 @@ router.post('/registrations/:id/approve', authenticateToken, requirePermission('
         data: {
           password: hashedPassword,
           role: 'technician',
-          isActive: true
+          isActive: true,
+          phone: normalizedPhone,
+          whatsappNumber: normalizedPhone
         }
       });
     } else {
       // Create user account for technician
       user = await prisma.user.create({
         data: {
-          username: registration.phone, // Use phone as username
+          username: normalizedPhone, // Use normalized phone as username
           password: hashedPassword,
           name: technician.name,
-          phone: registration.phone,
-          whatsappNumber: registration.phone,
+          phone: normalizedPhone,
+          whatsappNumber: normalizedPhone,
           role: 'technician',
           isActive: true
         }
@@ -145,12 +159,30 @@ router.post('/registrations/:id/approve', authenticateToken, requirePermission('
     // Send WhatsApp notification to technician
     try {
       const whatsappMessenger = require('../utils/whatsappMessenger');
-      const message = `✅ *Selamat! Registrasi Anda Telah Disetujui*
+      
+      // Ensure phone number is properly formatted
+      let phoneForNotif = registration.phone || registration.whatsappNumber;
+      if (!phoneForNotif) {
+        console.error('❌ No phone number found for notification');
+      } else {
+        // Normalize phone number
+        phoneForNotif = phoneForNotif.toString().replace(/[^0-9]/g, '');
+        if (phoneForNotif.startsWith('0')) {
+          phoneForNotif = '62' + phoneForNotif.substring(1);
+        }
+        if (!phoneForNotif.startsWith('62')) {
+          phoneForNotif = '62' + phoneForNotif;
+        }
+        
+        console.log('📱 Sending WhatsApp notification to:', phoneForNotif);
+        console.log('🔑 Generated credentials - Username:', phoneForNotif, 'Password:', randomPassword);
+        
+        const message = `✅ *Selamat! Registrasi Anda Telah Disetujui*
 
 Anda sekarang terdaftar sebagai teknisi di sistem kami.
 
 *Informasi Login:*
-📱 Username: ${registration.phone}
+📱 Username: ${phoneForNotif}
 🔑 Password: ${randomPassword}
 
 *URL Login:*
@@ -160,15 +192,18 @@ Silakan login dan ganti password Anda.
 
 Terima kasih! 🙏`;
 
-      const result = await whatsappMessenger.sendMessage(registration.phone, message);
-      
-      if (result.success) {
-        console.log('✅ WhatsApp notification sent to technician:', registration.phone);
-      } else {
-        console.error('❌ Failed to send WhatsApp notification:', result.error);
+        const result = await whatsappMessenger.sendMessage(phoneForNotif, message);
+        
+        if (result.success) {
+          console.log('✅ WhatsApp notification sent successfully to:', phoneForNotif);
+        } else {
+          console.error('❌ Failed to send WhatsApp notification:', result.error);
+          console.error('❌ Phone number used:', phoneForNotif);
+        }
       }
     } catch (notifError) {
-      console.error('Failed to send WhatsApp notification:', notifError);
+      console.error('❌ Exception in WhatsApp notification:', notifError);
+      console.error('Stack trace:', notifError.stack);
       // Don't fail the approval if notification fails
     }
 

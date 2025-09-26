@@ -70,7 +70,7 @@ export default function EditTechnicianPage() {
 
     try {
       setSaving(true)
-      await api.put(`/technicians/${id}`, formData)
+      await api.put(`/api/technicians/${id}`, formData)
       toast.success('Data teknisi berhasil diperbarui')
       router.push('/technicians')
     } catch (error: any) {
