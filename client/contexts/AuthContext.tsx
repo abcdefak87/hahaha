@@ -7,9 +7,11 @@ import { saveCredentials, clearCredentials } from '../lib/storage'
 
 interface User {
   id: string
-  email: string
+  phone: string  // Primary identifier - WhatsApp number
   name: string
+  username?: string
   role: 'superadmin' | 'admin' | 'gudang' | 'user' | 'technician'
+  whatsappNumber?: string
 }
 
 interface AuthContextType {

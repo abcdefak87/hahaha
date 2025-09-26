@@ -457,7 +457,7 @@ export default function Layout({ children, title }: LayoutProps) {
                      user?.role === 'admin' ? 'Administrator' :
                      user?.role === 'gudang' ? 'Gudang' : 
                      user?.role === 'user' ? 'User' : 
-                     user?.role === 'technician' ? 'Technician' : user?.name || user?.email?.split('@')[0]}
+                     user?.role === 'technician' ? 'Technician' : user?.name || user?.phone}
                   </p>
                   <div className="flex items-center gap-1.5">
                     <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
@@ -480,7 +480,7 @@ export default function Layout({ children, title }: LayoutProps) {
                 <div className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
                     <div className="px-4 py-2 border-b border-gray-100">
                       <p className="text-xs text-gray-500">Masuk sebagai</p>
-                      <p className="text-sm font-medium text-gray-900 truncate">{user?.email}</p>
+                      <p className="text-sm font-medium text-gray-900 truncate">{user?.phone || user?.username}</p>
                       <div className="text-xs text-blue-600 font-medium capitalize">
                         {user?.role === 'superadmin' ? 'Super Admin' : 
                          user?.role === 'admin' ? 'Admin' :
@@ -631,7 +631,7 @@ export default function Layout({ children, title }: LayoutProps) {
                          user?.role === 'admin' ? 'Administrator' :
                          user?.role === 'gudang' ? 'Gudang' : 
                          user?.role === 'user' ? 'User' : 
-                         user?.role === 'technician' ? 'Technician' : user?.name || user?.email?.split('@')[0]}
+                         user?.role === 'technician' ? 'Technician' : user?.name || user?.phone}
                       </p>
                       <div className="flex items-center gap-1">
                         <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
@@ -652,7 +652,7 @@ export default function Layout({ children, title }: LayoutProps) {
                   <button
                     onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                     className="w-full flex justify-center p-2 rounded-xl hover:bg-gray-50/80 transition-all duration-200 relative"
-                    title={user?.name || user?.email}
+                    title={user?.name || user?.phone}
                   >
                     <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                       <Suspense fallback={<div className="h-4 w-4 bg-gray-200 rounded "></div>}>
@@ -670,7 +670,7 @@ export default function Layout({ children, title }: LayoutProps) {
                   }`}>
                     <div className="px-4 py-2 border-b border-gray-100">
                       <p className="text-xs text-gray-500">Masuk sebagai</p>
-                      <p className="text-sm font-medium text-gray-900 truncate">{user?.email}</p>
+                      <p className="text-sm font-medium text-gray-900 truncate">{user?.phone || user?.username}</p>
                       <div className="text-xs text-blue-600 font-medium capitalize">
                         {user?.role === 'superadmin' ? 'Super Admin' : 
                          user?.role === 'admin' ? 'Admin' :
