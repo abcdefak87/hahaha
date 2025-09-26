@@ -40,7 +40,7 @@ export default function Inventory() {
   const fetchItems = useCallback(async () => {
     try {
       setIsLoading(true)
-      const response = await api.get(`/inventory/items?search=${search}&category=${categoryFilter}`)
+      const response = await api.get(`/api/inventory/items?search=${search}&category=${categoryFilter}`)
       setItems(response.data.data?.items || [])
     } catch (error: any) {
       console.error('Failed to fetch items:', error)

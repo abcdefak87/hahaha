@@ -29,7 +29,7 @@ export default function Reports() {
   const fetchReportData = useCallback(async () => {
     try {
       setIsLoading(true)
-      const response = await api.get(`/reports/${reportType}?days=${dateRange}`)
+      const response = await api.get(`/api/reports/${reportType}?days=${dateRange}`)
       setReportData(response.data)
     } catch (error: any) {
       console.error('Failed to fetch report data:', error)

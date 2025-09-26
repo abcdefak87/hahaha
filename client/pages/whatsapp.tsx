@@ -101,7 +101,7 @@ export default function WhatsApp() {
 
   const fetchBotStatus = async () => {
     try {
-      const response = await api.get('/whatsapp/status')
+      const response = await api.get('/api/whatsapp/status')
       const data = response.data
       
       console.log('Bot status data received:', data)
@@ -127,7 +127,7 @@ export default function WhatsApp() {
 
   const fetchStats = async () => {
     try {
-      const response = await api.get('/whatsapp/stats')
+      const response = await api.get('/api/whatsapp/stats')
       setStats(response.data)
     } catch (error) {
       console.error('Failed to fetch stats:', error)

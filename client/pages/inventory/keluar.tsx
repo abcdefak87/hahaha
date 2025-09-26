@@ -48,7 +48,7 @@ export default function BarangKeluar() {
 
   const fetchItems = async () => {
     try {
-      const response = await api.get('/inventory/items')
+      const response = await api.get('/api/inventory/items')
       setItems(response.data.data?.items || [])
     } catch (error) {
       console.error('Failed to fetch items:', error)
