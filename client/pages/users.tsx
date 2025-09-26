@@ -71,7 +71,7 @@ export default function UsersPage() {
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const response = await api.post('/users', userForm)
+      const response = await api.post('/api/users', userForm)
       if (response.data.tempData) {
         // OTP sent, show verification modal
         setTempUserData(response.data.tempData)
@@ -88,7 +88,7 @@ export default function UsersPage() {
     e.preventDefault()
     setIsVerifying(true)
     try {
-      await api.post('/users/verify-otp', {
+      await api.post('/api/users/verify-otp', {
         otp: otpCode,
         ...tempUserData
       })
@@ -107,7 +107,7 @@ export default function UsersPage() {
 
   const handleResendOtp = async () => {
     try {
-      await api.post('/users/resend-otp', {
+      await api.post('/api/users/resend-otp', {
         whatsappNumber: tempUserData.whatsappNumber,
         type: 'REGISTRATION'
       })
@@ -120,7 +120,7 @@ export default function UsersPage() {
   const handleUpdateUser = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      await api.put(`/users/${editingUser?.id}`, userForm)
+      await api.put(`/api/users/${editingUser?.id}`, userForm)
       toast.success('User berhasil diupdate')
       setEditingUser(null)
       setUserForm({ name: '', whatsappNumber: '', username: '', password: '', role: 'user', isActive: true })
@@ -134,7 +134,7 @@ export default function UsersPage() {
     if (!confirm('Yakin ingin menghapus user ini?')) return
     
     try {
-      await api.delete(`/users/${userId}`)
+      await api.delete(`/api/users/${userId}`)
       toast.success('User berhasil dihapus')
       fetchUsers()
     } catch (error) {
@@ -144,7 +144,7 @@ export default function UsersPage() {
 
   const toggleUserStatus = async (userId: string, currentStatus: boolean) => {
     try {
-      await api.patch(`/users/${userId}/toggle-status`)
+      await api.patch(`/api/users/${userId}/toggle-status`)
       toast.success(`User ${!currentStatus ? 'diaktifkan' : 'dinonaktifkan'}`)
       
       // Update local state instead of refetching all users
