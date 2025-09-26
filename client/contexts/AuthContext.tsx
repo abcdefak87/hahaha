@@ -81,32 +81,61 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const now = Date.now()
       if (!force && now - lastProfileFetch.current < profileCacheTimeout) {
         console.log('Using cached user profile, skipping API call')
+        setLoading(false)
         return
       }
       
       lastProfileFetch.current = now
       const response = await api.get('/api/auth/profile')
       setUser(response.data.user)
-    } catch (error) {
+      setLoading(false)
+    } catch (error: any) {
       console.error('Failed to fetch user:', error)
-      Cookies.remove('token')
-    } finally {
+      // Only remove token if it's actually invalid (401)
+      if (error.response?.status === 401) {
+        Cookies.remove('token')
+        setUser(null)
+      }
       setLoading(false)
     }
   }, [])
 
   useEffect(() => {
     const initAuth = async () => {
+      console.log('[AuthContext] Initializing auth...')
       const token = Cookies.get('token')
+      
       if (token) {
-        await fetchUser()
+        console.log('[AuthContext] Token found, fetching user...')
+        try {
+          const response = await api.get('/api/auth/profile')
+          setUser(response.data.user)
+          console.log('[AuthContext] User fetched successfully')
+        } catch (error: any) {
+          console.error('[AuthContext] Failed to fetch user:', error)
+          if (error.response?.status === 401) {
+            Cookies.remove('token')
+            setUser(null)
+          }
+        }
       } else {
-        setLoading(false)
+        console.log('[AuthContext] No token found')
       }
+      setLoading(false)
     }
     
+    // Tambahkan timeout untuk mencegah loading tak terbatas
+    const timeout = setTimeout(() => {
+      if (loading) {
+        console.warn('[AuthContext] Auth timeout, memaksa loading menjadi false')
+        setLoading(false)
+      }
+    }, 5000) // 5 detik timeout
+    
     initAuth()
-  }, [fetchUser])
+    
+    return () => clearTimeout(timeout)
+  }, []) // Hapus dependencies untuk mencegah infinite loop
 
   // Setup axios interceptor for 401 responses
   useEffect(() => {
