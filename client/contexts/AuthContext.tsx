@@ -113,7 +113,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.log('[AuthContext] User fetched successfully')
         } catch (error: any) {
           console.error('[AuthContext] Failed to fetch user:', error)
-          if (error.response?.status === 401) {
+          // Handle both 401 and 403 as authentication failures
+          if (error.response?.status === 401 || error.response?.status === 403) {
+            console.log('[AuthContext] Token invalid or expired, clearing auth')
             Cookies.remove('token')
             setUser(null)
           }
@@ -135,15 +137,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => clearTimeout(timeout)
   }, []) // Hapus dependencies untuk mencegah infinite loop
 
-  // Setup axios interceptor for 401 responses
+  // Setup axios interceptor for 401/403 responses
   useEffect(() => {
     const interceptor = api.interceptors.response.use(
       response => response,
       error => {
-        if (error.response?.status === 401) {
-          Cookies.remove('token')
-          setUser(null)
-          // Don't redirect automatically, let the component handle it
+        // Handle authentication errors
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          // Only clear auth if it's not the initial profile fetch
+          if (error.config?.url !== '/api/auth/profile') {
+            Cookies.remove('token')
+            setUser(null)
+            // Don't redirect automatically, let the component handle it
+          }
         } else if (error.response?.status === 500) {
           toast.error('Terjadi kesalahan server')
         }
