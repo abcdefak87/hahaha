@@ -37,13 +37,14 @@ const validatePassword = (password) => {
 
 // Register new user
 router.post('/register', [
-  body('email').isEmail().normalizeEmail(),
+  body('phone').notEmpty().trim(),
   body('password').custom((value) => {
     const error = validatePassword(value);
     if (error) throw new Error(error);
     return true;
   }),
   body('name').isLength({ min: 2 }).trim(),
+  body('username').optional().trim(),
   body('role').isIn(['superadmin', 'admin', 'gudang', 'user']).optional()
 ], async (req, res) => {
   try {
@@ -52,17 +53,20 @@ router.post('/register', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { email, password, name, role = 'admin' } = req.body;
+    const { phone, password, name, username, role = 'admin' } = req.body;
 
     // Check if user already exists
     const existingUser = await prisma.user.findFirst({
       where: {
-        email: email
+        OR: [
+          { phone: phone },
+          { username: username || undefined }
+        ]
       }
     });
 
     if (existingUser) {
-      return res.status(400).json({ error: 'Pengguna dengan email ini sudah ada' });
+      return res.status(400).json({ error: 'Pengguna dengan nomor telepon atau username ini sudah ada' });
     }
 
     // Hash password
@@ -71,14 +75,17 @@ router.post('/register', [
     // Create user
     const user = await prisma.user.create({
       data: {
-        email,
+        phone,
+        username: username || phone,
         password: hashedPassword,
         name,
-        role
+        role,
+        whatsappNumber: phone
       },
       select: {
         id: true,
-        email: true,
+        phone: true,
+        username: true,
         name: true,
         role: true,
         createdAt: true
@@ -95,7 +102,7 @@ router.post('/register', [
 // Login
 router.post('/login', [
   body('username').optional().trim(),
-  body('email').optional().trim(),
+  body('phone').optional().trim(),
   body('password').notEmpty()
 ], async (req, res) => {
   try {
@@ -104,19 +111,19 @@ router.post('/login', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { username, email, password } = req.body;
-    const identifier = username || email;
+    const { username, phone, password } = req.body;
+    const identifier = username || phone;
 
     if (!identifier) {
-      return res.status(400).json({ error: 'Username atau email diperlukan' });
+      return res.status(400).json({ error: 'Username atau nomor telepon diperlukan' });
     }
 
-    // Find user by username or email
+    // Find user by username or phone
     const user = await prisma.user.findFirst({
       where: {
         OR: [
           { username: identifier },
-          { email: identifier }
+          { phone: identifier }
         ],
         isActive: true
       }
