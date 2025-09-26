@@ -35,13 +35,13 @@ export class WebSocketClient extends EventEmitter {
     
     this.config = {
       url: config.url,
-      protocols: config.protocols,
+      protocols: config.protocols || undefined,
       reconnect: config.reconnect ?? true,
       reconnectInterval: config.reconnectInterval ?? 5000,
       maxReconnectAttempts: config.maxReconnectAttempts ?? Infinity,
       heartbeatInterval: config.heartbeatInterval ?? 30000,
       debug: config.debug ?? false
-    };
+    } as Required<WebSocketConfig>;
   }
 
   /**
