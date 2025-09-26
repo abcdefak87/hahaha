@@ -126,11 +126,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     // Tambahkan timeout untuk mencegah loading tak terbatas
     const timeout = setTimeout(() => {
-      if (loading) {
-        console.warn('[AuthContext] Auth timeout, memaksa loading menjadi false')
-        setLoading(false)
-      }
-    }, 5000) // 5 detik timeout
+      console.warn('[AuthContext] Auth timeout, memaksa loading menjadi false')
+      setLoading(false)
+    }, 2000) // 2 detik timeout
     
     initAuth()
     
