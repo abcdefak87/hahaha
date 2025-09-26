@@ -6,6 +6,117 @@ const { authenticateToken, requirePermission } = require('../middleware/auth');
 const router = express.Router();
 const prisma = require('../utils/database');
 
+// Get pending technician registrations
+router.get('/registrations', authenticateToken, requirePermission('technicians:view'), async (req, res) => {
+  try {
+    const registrations = await prisma.technicianRegistration.findMany({
+      where: {
+        status: 'PENDING'
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    res.json({
+      success: true,
+      data: registrations
+    });
+  } catch (error) {
+    console.error('Get technician registrations error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch technician registrations'
+    });
+  }
+});
+
+// Approve technician registration
+router.post('/registrations/:id/approve', authenticateToken, requirePermission('technicians:create'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Get registration
+    const registration = await prisma.technicianRegistration.findUnique({
+      where: { id }
+    });
+
+    if (!registration) {
+      return res.status(404).json({
+        success: false,
+        error: 'Registration not found'
+      });
+    }
+
+    if (registration.status !== 'PENDING') {
+      return res.status(400).json({
+        success: false,
+        error: 'Registration already processed'
+      });
+    }
+
+    // Create technician
+    const technician = await prisma.technician.create({
+      data: {
+        name: `${registration.firstName} ${registration.lastName || ''}`.trim(),
+        phone: registration.phone,
+        whatsappJid: registration.telegramChatId || `${registration.phone}@s.whatsapp.net`,
+        isActive: true,
+        isAdmin: false
+      }
+    });
+
+    // Update registration status
+    await prisma.technicianRegistration.update({
+      where: { id },
+      data: {
+        status: 'APPROVED',
+        approvedAt: new Date(),
+        approvedBy: req.user.userId
+      }
+    });
+
+    res.json({
+      success: true,
+      data: technician
+    });
+  } catch (error) {
+    console.error('Approve technician registration error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to approve registration'
+    });
+  }
+});
+
+// Reject technician registration
+router.post('/registrations/:id/reject', authenticateToken, requirePermission('technicians:create'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+    
+    // Update registration status
+    await prisma.technicianRegistration.update({
+      where: { id },
+      data: {
+        status: 'REJECTED',
+        rejectionReason: reason
+      }
+    });
+
+    res.json({
+      success: true,
+      message: 'Registration rejected'
+    });
+  } catch (error) {
+    console.error('Reject technician registration error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to reject registration'
+    });
+  }
+});
+
 // Get all technicians
 router.get('/', authenticateToken, requirePermission('technicians:view'), async (req, res) => {
   try {

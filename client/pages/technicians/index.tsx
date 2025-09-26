@@ -106,16 +106,12 @@ export default function Technicians() {
   const fetchRegistrations = async () => {
     try {
       setIsLoadingRegistrations(true)
-      // TODO: Endpoint /api/technicians/registrations belum ada di backend
-      // Untuk sementara, set registrations sebagai array kosong
-      // const response = await api.get('/api/technicians/registrations')
-      // setRegistrations(response.data.data || [])
-      setRegistrations([]) // Temporary: set empty array until endpoint is implemented
+      const response = await api.get('/api/technicians/registrations')
+      setRegistrations(response.data.data || [])
     } catch (error) {
       console.error('Failed to fetch registrations:', error)
       setRegistrations([]) // Ensure registrations is always an array
-      // Tidak tampilkan error toast karena endpoint memang belum ada
-      // toast.error('Gagal memuat data registrasi')
+      toast.error('Gagal memuat data registrasi')
     } finally {
       setIsLoadingRegistrations(false)
     }
@@ -140,9 +136,10 @@ export default function Technicians() {
 
   const approveRegistration = async (registrationId: string, formData: any) => {
     try {
-      await api.post(`/registrations/${registrationId}/approve`, formData)
+      await api.post(`/api/technicians/registrations/${registrationId}/approve`, formData)
       toast.success('Registrasi berhasil disetujui')
       fetchRegistrations()
+      fetchTechnicians() // Refresh technicians list
     } catch (error: any) {
       const message = error.response?.data?.error || 'Gagal menyetujui registrasi'
       toast.error(message)
@@ -151,7 +148,7 @@ export default function Technicians() {
 
   const rejectRegistration = async (registrationId: string, reason: string) => {
     try {
-      await api.post(`/registrations/${registrationId}/reject`, { reason })
+      await api.post(`/api/technicians/registrations/${registrationId}/reject`, { reason })
       toast.success('Registrasi berhasil ditolak')
       fetchRegistrations()
     } catch (error: any) {
