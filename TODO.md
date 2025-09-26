@@ -1,6 +1,7 @@
 # Catatan Pengembangan
 
 ## Yang udah selesai ✅
+
 - Setup database SQLite
 - Login & authentication JWT
 - Dashboard admin
@@ -11,11 +12,13 @@
 - Role-based access control
 
 ## Yang lagi dikerjain 🚧
+
 - Optimize performa dashboard
 - Testing WhatsApp broadcast
 - Perbaiki UI mobile responsive
 
 ## Rencana kedepan 📝
+
 - Tambahin fitur laporan bulanan
 - Export data ke Excel
 - Backup otomatis database
@@ -26,11 +29,13 @@
 - Unit testing yang lebih lengkap
 
 ## Bug yang perlu difix 🐛
+
 - Session WhatsApp kadang disconnect sendiri
 - Loading spinner di halaman customer agak lama
 - Filter tanggal di laporan belum sempurna
 
 ## Ide fitur dari user 💡
+
 - Dashboard untuk pelanggan (self-service)
 - Integrasi payment gateway
 - Monitoring bandwidth real-time
@@ -38,4 +43,5 @@
 - Tracking lokasi teknisi dengan GPS
 
 ---
-*Last update: 26 September 2025*
+
+**Last update: 26 September 2025**
