@@ -106,12 +106,16 @@ export default function Technicians() {
   const fetchRegistrations = async () => {
     try {
       setIsLoadingRegistrations(true)
-      const response = await api.get('/api/technicians/registrations')
-      setRegistrations(response.data.data || [])
+      // TODO: Endpoint /api/technicians/registrations belum ada di backend
+      // Untuk sementara, set registrations sebagai array kosong
+      // const response = await api.get('/api/technicians/registrations')
+      // setRegistrations(response.data.data || [])
+      setRegistrations([]) // Temporary: set empty array until endpoint is implemented
     } catch (error) {
       console.error('Failed to fetch registrations:', error)
       setRegistrations([]) // Ensure registrations is always an array
-      toast.error('Gagal memuat data registrasi')
+      // Tidak tampilkan error toast karena endpoint memang belum ada
+      // toast.error('Gagal memuat data registrasi')
     } finally {
       setIsLoadingRegistrations(false)
     }
