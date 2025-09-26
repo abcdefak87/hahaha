@@ -121,27 +121,27 @@ api.interceptors.response.use(
 // API endpoints
 export const authAPI = {
   login: async (data: { username: string; password: string }) => {
-    const response = await api.post('/auth/login', data);
+    const response = await api.post('/api/auth/login', data);
     // Store refresh token
     if (response.data.refreshToken) {
       Cookies.set('refreshToken', response.data.refreshToken);
     }
     return response;
   },
-  register: (data: any) => api.post('/auth/register', data),
-  profile: () => api.get('/auth/profile'),
-  updateProfile: (data: any) => api.put('/auth/profile', data),
-  changePassword: (data: any) => api.put('/auth/change-password', data),
+  register: (data: any) => api.post('/api/auth/register', data),
+  profile: () => api.get('/api/auth/profile'),
+  updateProfile: (data: any) => api.put('/api/auth/profile', data),
+  changePassword: (data: any) => api.put('/api/auth/change-password', data),
   logout: async () => {
     try {
-      await api.post('/auth/logout');
+      await api.post('/api/auth/logout');
     } finally {
       // Always clear tokens
       Cookies.remove('token');
       Cookies.remove('refreshToken');
     }
   },
-  refresh: (refreshToken: string) => api.post('/auth/refresh', { refreshToken }),
+  refresh: (refreshToken: string) => api.post('/api/auth/refresh', { refreshToken }),
 }
 
 export const jobsAPI = {

@@ -58,7 +58,7 @@ export default function Profile() {
         updateData.newPassword = formData.newPassword
       }
 
-      const response = await api.put('/auth/profile', updateData)
+      const response = await api.put('/api/auth/profile', updateData)
       const data = response.data
 
       // Note: User context will be updated automatically via API interceptor

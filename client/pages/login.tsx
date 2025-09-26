@@ -214,7 +214,7 @@ export default function Login() {
                 e.preventDefault()
                 setIsLoading(true)
                 try {
-                  const response = await api.post('/auth/forgot-password', {
+                  const response = await api.post('/api/auth/forgot-password', {
                     identifier: forgotPasswordIdentifier
                   })
                   // Store the user ID returned from the backend
@@ -282,7 +282,7 @@ export default function Login() {
                 e.preventDefault()
                 setIsVerifying(true)
                 try {
-                  const response = await api.post('/auth/verify-reset-otp', {
+                  const response = await api.post('/api/auth/verify-reset-otp', {
                     identifier: userId, // Use the stored user ID, not the original identifier
                     otp: otpCode
                   })
@@ -317,7 +317,7 @@ export default function Login() {
                     type="button"
                     onClick={async () => {
                       try {
-                        await api.post('/auth/resend-reset-otp', {
+                        await api.post('/api/auth/resend-reset-otp', {
                           identifier: userId // Use the stored user ID for resending OTP
                         })
                         toast.success('OTP telah dikirim ulang')
@@ -372,7 +372,7 @@ export default function Login() {
                 }
                 setIsLoading(true)
                 try {
-                  await api.post('/auth/reset-password', {
+                  await api.post('/api/auth/reset-password', {
                     resetToken,
                     newPassword
                   })

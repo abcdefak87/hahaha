@@ -127,7 +127,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (username: string, password: string, rememberMe: boolean = false): Promise<boolean> => {
     try {
-      const response = await api.post('/auth/login', { username, password })
+      const response = await api.post('/api/auth/login', { username, password })
       const { token, refreshToken, user } = response.data
 
       Cookies.set('token', token, { expires: 1 }) // 1 day
