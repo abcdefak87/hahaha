@@ -106,6 +106,7 @@ const NotificationSystem: React.FC = () => {
         websocketService.offUserUpdate(userUpdateCallback);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const addNotification = (notification: Notification) => {

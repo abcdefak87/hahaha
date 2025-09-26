@@ -65,6 +65,7 @@ export default function TechnicianDetailPage() {
       fetchTechnician()
       fetchJobAssignments()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
   const fetchTechnician = async () => {
